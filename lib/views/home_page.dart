@@ -3,6 +3,7 @@ import 'package:petagenda/notifiers/sessao_notifier.dart';
 import 'package:petagenda/services/auth_service.dart';
 import 'package:petagenda/util/tema.dart';
 import 'package:petagenda/views/login_page.dart';
+import 'package:petagenda/widgets/logo_petagenda.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -20,7 +21,7 @@ class HomePage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/logo_branca.png', height: 30),
+            const LogoPetAgenda(altura: 30),
             const SizedBox(width: 8.0),
             const Text('PetAgenda'),
           ],
@@ -63,7 +64,7 @@ class HomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Image.asset('assets/logo_branca.png', height: 48),
+                const LogoPetAgenda(altura: 48),
                 const SizedBox(height: 8.0),
                 Text(
                   sessao.nome,

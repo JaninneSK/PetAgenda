@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:petagenda/util/tema.dart';
 import 'package:petagenda/views/home_page.dart';
 import 'package:petagenda/views/login_page.dart';
+import 'package:petagenda/widgets/logo_petagenda.dart';
 
 class SplashPage extends StatefulWidget {
   static const nomeRota = '/splash';
@@ -45,7 +46,7 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/logo_branca.png', width: 160),
+            const LogoPetAgenda(largura: 160),
             const SizedBox(height: 12.0),
             const Text(
               'PetAgenda',

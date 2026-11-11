@@ -11,6 +11,10 @@ class Tema {
   static const Color fundo = Color(0xFFF5F5F5);
   static const Color textoEscuro = Color(0xFF1F2D2A);
 
+  // Cores dos erros de validação
+  static const Color vermelhoErro = Color(0xFFB3261E);
+  static const Color fundoErro = Color(0xFFFFE3E0);
+
   static OutlineInputBorder _borda(Color cor, double largura) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(12.0),
@@ -20,19 +24,23 @@ class Tema {
 
   // Aparência de todos os campos de texto do app
   static InputDecorationTheme _temaCampos({
-    required Color corErro,
     required TextStyle estiloErro,
     Color? corContador,
   }) {
     return InputDecorationTheme(
       filled: true,
-      fillColor: cinzaCampo,
+      // O campo com erro fica com fundo rosado e borda vermelha grossa
+      fillColor: WidgetStateColor.resolveWith(
+        (estados) =>
+            estados.contains(WidgetState.error) ? fundoErro : cinzaCampo,
+      ),
       border: _borda(Colors.transparent, 0),
       enabledBorder: _borda(Colors.transparent, 0),
       focusedBorder: _borda(verdeEscuro, 2),
-      errorBorder: _borda(corErro, 1.5),
-      focusedErrorBorder: _borda(corErro, 2),
+      errorBorder: _borda(vermelhoErro, 2),
+      focusedErrorBorder: _borda(vermelhoErro, 2.5),
       errorStyle: estiloErro,
+      errorMaxLines: 3,
       // contador de caracteres do maxLength (ex: 0/40)
       counterStyle: corContador == null ? null : TextStyle(color: corContador),
     );
@@ -44,6 +52,7 @@ class Tema {
       onPrimary: Colors.white,
       secondary: laranja,
       onSecondary: textoEscuro,
+      error: vermelhoErro,
     );
 
     return ThemeData(
@@ -55,8 +64,11 @@ class Tema {
         centerTitle: true,
       ),
       inputDecorationTheme: _temaCampos(
-        corErro: esquema.error,
-        estiloErro: TextStyle(color: esquema.error),
+        estiloErro: const TextStyle(
+          color: vermelhoErro,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -77,14 +89,16 @@ class Tema {
   }
 
   /// Ajusta o tema para as telas com fundo verde (login e cadastro):
-  /// mensagens de erro em branco e botões de texto brancos.
+  /// a mensagem de erro aparece em vermelho sobre uma faixa branca
+  /// (vermelho direto no verde quase não aparece).
   static ThemeData sobreVerde(ThemeData base) {
     return base.copyWith(
       inputDecorationTheme: _temaCampos(
-        corErro: Colors.white,
         estiloErro: const TextStyle(
-          color: Colors.white,
+          color: vermelhoErro,
+          backgroundColor: Colors.white,
           fontWeight: FontWeight.bold,
+          fontSize: 13,
         ),
         corContador: Colors.white,
       ),

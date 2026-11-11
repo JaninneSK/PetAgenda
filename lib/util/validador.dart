@@ -53,7 +53,19 @@ class Validador {
     };
   }
 
-  /// O Firebase exige senhas com no mínimo 6 caracteres
+  /// Login: a senha já existe, então só conferimos se foi preenchida.
+  /// Se estiver errada, o Firebase avisa (não mostramos regra de tamanho aqui).
+  static FormFieldValidator<String> validarSenhaObrigatoria() {
+    return (value) {
+      if (value == null || value.isEmpty) {
+        return "Informe a senha";
+      } else {
+        return null;
+      }
+    };
+  }
+
+  /// Cadastro: o Firebase exige senhas com no mínimo 6 caracteres
   static FormFieldValidator<String> validarSenha() {
     return (value) {
       final texto = value ?? '';

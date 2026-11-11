@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:petagenda/services/auth_service.dart';
+import 'package:petagenda/util/mensagem.dart';
 import 'package:petagenda/util/mensagens_erro.dart';
 import 'package:petagenda/util/tema.dart';
 import 'package:petagenda/util/validador.dart';
@@ -192,12 +193,35 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
                   ),
                 ),
                 if (campo.hasError)
-                  Text(
-                    campo.errorText!,
-                    style: const TextStyle(
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 18,
+                          color: Tema.vermelhoErro,
+                        ),
+                        const SizedBox(width: 6.0),
+                        Flexible(
+                          child: Text(
+                            campo.errorText!,
+                            style: const TextStyle(
+                              color: Tema.vermelhoErro,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
               ],
@@ -239,9 +263,9 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
         (rota) => false,
       );
     } on FirebaseAuthException catch (erro) {
-      _mostrarMensagem(mensagemErroAuth(erro));
+      _mostrarMensagem(mensagemErroAuth(erro), erro: true);
     } catch (erro) {
-      _mostrarMensagem('Não foi possível criar a conta: $erro');
+      _mostrarMensagem('Não foi possível criar a conta: $erro', erro: true);
     } finally {
       if (mounted) setState(() => _salvando = false);
     }
@@ -290,10 +314,8 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
     );
   }
 
-  void _mostrarMensagem(String mensagem) {
+  void _mostrarMensagem(String mensagem, {bool erro = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    mostrarMensagem(context, mensagem, erro: erro);
   }
 }

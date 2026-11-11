@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:petagenda/services/auth_service.dart';
+import 'package:petagenda/util/mensagem.dart';
 import 'package:petagenda/util/mensagens_erro.dart';
 import 'package:petagenda/util/tema.dart';
 import 'package:petagenda/util/validador.dart';
 import 'package:petagenda/views/cadastro_usuario.dart';
 import 'package:petagenda/views/home_page.dart';
 import 'package:petagenda/widgets/conteudo_centralizado.dart';
+import 'package:petagenda/widgets/logo_petagenda.dart';
 
 class LoginPage extends StatefulWidget {
   static const nomeRota = '/login';
@@ -62,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _construirFormulario() {
     return Column(
       children: <Widget>[
-        Image.asset('assets/logo_branca.png', width: 130),
+        const LogoPetAgenda(largura: 130),
         const SizedBox(height: 8.0),
         const Text(
           'PetAgenda',
@@ -87,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
 
         TextFormField(
           controller: controllerSenha,
-          validator: Validador.validarSenha(),
+          validator: Validador.validarSenhaObrigatoria(),
           obscureText: _ocultarSenha,
           obscuringCharacter: "*",
           decoration: InputDecoration(
@@ -143,9 +145,9 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, HomePage.nomeRota);
     } on FirebaseAuthException catch (erro) {
-      _mostrarMensagem(mensagemErroAuth(erro));
+      _mostrarMensagem(mensagemErroAuth(erro), erro: true);
     } catch (erro) {
-      _mostrarMensagem('Erro inesperado: $erro');
+      _mostrarMensagem('Erro inesperado: $erro', erro: true);
     } finally {
       if (mounted) setState(() => _entrando = false);
     }
@@ -155,7 +157,10 @@ class _LoginPageState extends State<LoginPage> {
     // Usa o e-mail que já foi digitado no campo acima
     final erro = Validador.validarEmail()(controllerEmail.text);
     if (erro != null) {
-      _mostrarMensagem('Digite seu e-mail no campo acima para recuperar a senha.');
+      _mostrarMensagem(
+        'Digite um e-mail válido no campo acima para recuperar a senha.',
+        erro: true,
+      );
       return;
     }
 
@@ -165,16 +170,14 @@ class _LoginPageState extends State<LoginPage> {
         'Se o e-mail estiver cadastrado, enviamos um link para redefinir a senha.',
       );
     } on FirebaseAuthException catch (erro) {
-      _mostrarMensagem(mensagemErroAuth(erro));
+      _mostrarMensagem(mensagemErroAuth(erro), erro: true);
     } catch (erro) {
-      _mostrarMensagem('Erro inesperado: $erro');
+      _mostrarMensagem('Erro inesperado: $erro', erro: true);
     }
   }
 
-  void _mostrarMensagem(String mensagem) {
+  void _mostrarMensagem(String mensagem, {bool erro = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    mostrarMensagem(context, mensagem, erro: erro);
   }
 }
