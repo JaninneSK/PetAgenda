@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:petagenda/util/tema.dart';
+import 'package:petagenda/views/cadastrar_agendamento.dart';
+import 'package:petagenda/views/cadastrar_pet.dart';
 import 'package:petagenda/views/cadastro_usuario.dart';
+import 'package:petagenda/views/detalhes_pet.dart';
 import 'package:petagenda/views/home_page.dart';
+import 'package:petagenda/views/listar_agendamentos.dart';
 import 'package:petagenda/views/login_page.dart';
+import 'package:petagenda/views/meus_pets.dart';
 import 'package:petagenda/views/splash_page.dart';
 
 class MyApp extends StatelessWidget {
@@ -31,6 +36,12 @@ class MyApp extends StatelessWidget {
         LoginPage.nomeRota: (context) => const LoginPage(),
         CadastroUsuario.nomeRota: (context) => const CadastroUsuario(),
         HomePage.nomeRota: (context) => const HomePage(),
+        MeusPets.nomeRota: (context) => const MeusPets(),
+        CadastrarPet.nomeRota: (context) => const CadastrarPet(),
+        DetalhesPet.nomeRota: (context) => const DetalhesPet(),
+        ListarAgendamentos.nomeRota: (context) => const ListarAgendamentos(),
+        CadastrarAgendamento.nomeRota: (context) =>
+            const CadastrarAgendamento(),
       },
     );
   }

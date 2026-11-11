@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:petagenda/notifiers/sessao_notifier.dart';
 import 'package:petagenda/services/auth_service.dart';
 import 'package:petagenda/util/tema.dart';
+import 'package:petagenda/views/cadastrar_agendamento.dart';
+import 'package:petagenda/views/cadastrar_pet.dart';
+import 'package:petagenda/views/listar_agendamentos.dart';
 import 'package:petagenda/views/login_page.dart';
+import 'package:petagenda/views/meus_pets.dart';
 import 'package:petagenda/widgets/logo_petagenda.dart';
 import 'package:provider/provider.dart';
 
@@ -41,8 +45,8 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 8.0),
               const Text(
-                'Login funcionando. Nos próximos passos esta tela vai mostrar '
-                'o calendário e os seus pets.',
+                'Use o menu para cadastrar e ver seus pets. Nos próximos passos '
+                'esta tela vai mostrar o calendário e os agendamentos.',
                 textAlign: TextAlign.center,
               ),
             ],
@@ -57,17 +61,26 @@ class HomePage extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(
-            margin: EdgeInsets.zero,
-            decoration: const BoxDecoration(color: Tema.verde),
+          // Cabeçalho sem altura fixa: acompanha o conteúdo e não estoura.
+          // (O DrawerHeader tem altura fixa e causava "bottom overflowed".)
+          Container(
+            width: double.infinity,
+            color: Tema.verde,
+            padding: EdgeInsets.fromLTRB(
+              16,
+              MediaQuery.of(context).padding.top + 16, // abaixo da barra de status
+              16,
+              16,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 const LogoPetAgenda(altura: 48),
                 const SizedBox(height: 8.0),
                 Text(
                   sessao.nome,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -76,16 +89,33 @@ class HomePage extends StatelessWidget {
                 ),
                 Text(
                   sessao.email,
-                  style: const TextStyle(color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
             ),
           ),
-          // As telas abaixo serão criadas nos próximos passos
-          _itemMenu(context, Icons.pets, 'Meus pets'),
-          _itemMenu(context, Icons.add_circle_outline, 'Cadastrar pet'),
-          _itemMenu(context, Icons.event, 'Agendamentos'),
-          _itemMenu(context, Icons.edit_calendar, 'Novo agendamento'),
+          _itemMenu(context, Icons.pets, 'Meus pets', MeusPets.nomeRota),
+          _itemMenu(
+            context,
+            Icons.add_circle_outline,
+            'Cadastrar pet',
+            CadastrarPet.nomeRota,
+          ),
+          _itemMenu(
+            context,
+            Icons.event,
+            'Agendamentos',
+            ListarAgendamentos.nomeRota,
+          ),
+          _itemMenu(
+            context,
+            Icons.edit_calendar,
+            'Novo agendamento',
+            CadastrarAgendamento.nomeRota,
+          ),
+          // A tela abaixo será criada nos próximos passos
           _itemMenu(context, Icons.account_circle, 'Minha conta'),
           const Divider(),
           ListTile(
@@ -107,16 +137,26 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _itemMenu(BuildContext context, IconData icone, String titulo) {
+  // Se vier uma rota, navega para ela; se não, avisa que a tela ainda não existe.
+  Widget _itemMenu(
+    BuildContext context,
+    IconData icone,
+    String titulo, [
+    String? rota,
+  ]) {
     return ListTile(
       leading: Icon(icone),
       title: Text(titulo),
       onTap: () {
         Navigator.pop(context); // fecha o menu
-        // TODO: navegar para a tela correspondente (próximos passos)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"$titulo" será criado no próximo passo.')),
-        );
+        if (rota != null) {
+          Navigator.pushNamed(context, rota);
+        } else {
+          // TODO: navegar para a tela correspondente (próximos passos)
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('"$titulo" será criado no próximo passo.')),
+          );
+        }
       },
     );
   }
