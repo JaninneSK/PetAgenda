@@ -1,0 +1,17 @@
+# Trecho para conferir/ajustar no pubspec.yaml do seu projeto.
+# (as dependências são adicionadas pelos comandos "flutter pub add" do README;
+#  o bloco "assets" você precisa escrever à mão)
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # firebase_core, firebase_auth, cloud_firestore, provider e intl
+  # entram sozinhos pelo "flutter pub add"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/logo_branca.png
