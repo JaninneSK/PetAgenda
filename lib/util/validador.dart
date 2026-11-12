@@ -231,4 +231,40 @@ class Validador {
       return null;
     };
   }
+
+  /// Idade aproximada, campo "anos": inteiro de 0 a 40. Também confere se,
+  /// somada aos meses, a idade não ficou zerada.
+  static FormFieldValidator<String> validarIdadeAnos(
+    TextEditingController controllerMeses,
+  ) {
+    return (value) {
+      final texto = value?.trim() ?? '';
+      final anos = texto.isEmpty ? 0 : int.tryParse(texto);
+      if (anos == null) {
+        return "Use apenas números";
+      } else if (anos > 40) {
+        return "No máximo 40 anos";
+      }
+      final meses = int.tryParse(controllerMeses.text.trim()) ?? 0;
+      if (anos == 0 && meses == 0) {
+        return "Informe a idade aproximada";
+      }
+      return null;
+    };
+  }
+
+  /// Idade aproximada, campo "meses": vazio é aceito (conta como 0), ou de 0 a 11
+  static FormFieldValidator<String> validarIdadeMeses() {
+    return (value) {
+      final texto = value?.trim() ?? '';
+      if (texto.isEmpty) return null;
+      final meses = int.tryParse(texto);
+      if (meses == null) {
+        return "Use apenas números";
+      } else if (meses > 11) {
+        return "De 0 a 11 meses";
+      }
+      return null;
+    };
+  }
 }

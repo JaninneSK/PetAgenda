@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petagenda/models/especies.dart';
 import 'package:petagenda/models/pet.dart';
@@ -16,6 +17,9 @@ import 'package:petagenda/widgets/avatar_pet.dart';
 import 'package:petagenda/widgets/campo_data.dart';
 import 'package:petagenda/widgets/conteudo_centralizado.dart';
 import 'package:provider/provider.dart';
+
+/// Como o tutor informa o nascimento do pet
+enum _ModoNascimento { data, idade, naoSei }
 
 /// Serve para cadastrar e também para editar:
 /// se receber um Pet como argumento da rota, a tela abre em modo de edição.
@@ -37,12 +41,15 @@ class _CadastrarPetState extends State<CadastrarPet> {
   String? _sexo;
   String? _porte;
   String? _foto;
+  _ModoNascimento _modoNascimento = _ModoNascimento.data;
   bool _carregado = false;
   bool _salvando = false;
 
   final controllerNome = TextEditingController();
   final controllerRaca = TextEditingController();
   final controllerNascimento = TextEditingController();
+  final controllerAnos = TextEditingController();
+  final controllerMeses = TextEditingController();
   final controllerPeso = TextEditingController();
   final controllerObservacoes = TextEditingController();
 
@@ -61,7 +68,17 @@ class _CadastrarPetState extends State<CadastrarPet> {
       _pet = argumento;
       controllerNome.text = _pet.nome ?? '';
       controllerRaca.text = _pet.raca ?? '';
-      controllerNascimento.text = formatarData(_pet.dataNascimento);
+      if (_pet.dataNascimento == null) {
+        _modoNascimento = _ModoNascimento.naoSei;
+      } else if (_pet.nascimentoAproximado) {
+        // idade aproximada: mostra a idade de hoje nos campos anos e meses
+        _modoNascimento = _ModoNascimento.idade;
+        final idade = idadeEmAnosEMeses(_pet.dataNascimento!);
+        controllerAnos.text = '${idade.anos}';
+        controllerMeses.text = '${idade.meses}';
+      } else {
+        controllerNascimento.text = formatarData(_pet.dataNascimento);
+      }
       controllerPeso.text = _pet.peso?.toString().replaceAll('.', ',') ?? '';
       controllerObservacoes.text = _pet.observacoes ?? '';
       _especie = _pet.especie;
@@ -77,6 +94,8 @@ class _CadastrarPetState extends State<CadastrarPet> {
     controllerNome.dispose();
     controllerRaca.dispose();
     controllerNascimento.dispose();
+    controllerAnos.dispose();
+    controllerMeses.dispose();
     controllerPeso.dispose();
     controllerObservacoes.dispose();
     super.dispose();
@@ -159,13 +178,7 @@ class _CadastrarPetState extends State<CadastrarPet> {
         ),
         const SizedBox(height: 16.0),
 
-        CampoData(
-          controller: controllerNascimento,
-          rotulo: 'Data de nascimento',
-          validador: Validador.validarDataNascimento(),
-          primeiraData: DateTime(hoje().year - 40),
-          ultimaData: hoje(),
-        ),
+        _construirNascimento(),
         const SizedBox(height: 16.0),
 
         DropdownButtonFormField<String>(
@@ -213,6 +226,102 @@ class _CadastrarPetState extends State<CadastrarPet> {
           ),
         ),
         const SizedBox(height: 24.0),
+      ],
+    );
+  }
+
+  // Nascimento: data exata, idade aproximada ou "não sei" (campo opcional)
+  Widget _construirNascimento() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Nascimento',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8.0),
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<_ModoNascimento>(
+            showSelectedIcon: false,
+            style: SegmentedButton.styleFrom(
+              selectedBackgroundColor: Tema.verdeEscuro,
+              selectedForegroundColor: Colors.white,
+            ),
+            segments: const [
+              ButtonSegment(value: _ModoNascimento.data, label: Text('Data')),
+              ButtonSegment(
+                value: _ModoNascimento.idade,
+                label: Text('Idade aprox.'),
+              ),
+              ButtonSegment(
+                value: _ModoNascimento.naoSei,
+                label: Text('Não sei'),
+              ),
+            ],
+            selected: {_modoNascimento},
+            onSelectionChanged: (escolhido) {
+              setState(() => _modoNascimento = escolhido.first);
+            },
+          ),
+        ),
+        const SizedBox(height: 12.0),
+
+        if (_modoNascimento == _ModoNascimento.data)
+          CampoData(
+            controller: controllerNascimento,
+            rotulo: 'Data de nascimento',
+            validador: Validador.validarDataNascimento(),
+            primeiraData: DateTime(hoje().year - 40),
+            ultimaData: hoje(),
+          ),
+
+        if (_modoNascimento == _ModoNascimento.idade) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: controllerAnos,
+                  validator: Validador.validarIdadeAnos(controllerMeses),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Anos',
+                    counterText: '',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: TextFormField(
+                  controller: controllerMeses,
+                  validator: Validador.validarIdadeMeses(),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Meses',
+                    counterText: '',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4.0),
+          const Text(
+            'A idade é calculada a partir de hoje e aparece como aproximada.',
+            style: TextStyle(fontSize: 12),
+          ),
+        ],
+
+        if (_modoNascimento == _ModoNascimento.naoSei)
+          const Text(
+            'Sem o nascimento, a idade do pet não será exibida. '
+            'Você pode informar depois, editando o pet.',
+            style: TextStyle(fontSize: 12),
+          ),
       ],
     );
   }
@@ -318,13 +427,27 @@ class _CadastrarPetState extends State<CadastrarPet> {
       final raca = controllerRaca.text.trim();
       final observacoes = controllerObservacoes.text.trim();
 
+      // Nascimento: data exata, idade aproximada ou não informado
+      DateTime? nascimento;
+      bool aproximado = false;
+      if (_modoNascimento == _ModoNascimento.data) {
+        nascimento = lerData(controllerNascimento.text);
+      } else if (_modoNascimento == _ModoNascimento.idade) {
+        final anos = int.tryParse(controllerAnos.text.trim()) ?? 0;
+        final meses = int.tryParse(controllerMeses.text.trim()) ?? 0;
+        // Usa o dia 1 do mês: assim a idade calculada bate com a informada
+        nascimento = DateTime(hoje().year - anos, hoje().month - meses, 1);
+        aproximado = true;
+      }
+
       final pet = Pet.comParametros(
         id: _pet.id, // nulo no cadastro, preenchido na edição
         nome: controllerNome.text.trim(),
         especie: _especie,
         raca: raca.isEmpty ? null : raca,
         sexo: _sexo,
-        dataNascimento: lerData(controllerNascimento.text),
+        dataNascimento: nascimento,
+        nascimentoAproximado: aproximado,
         porte: _porte,
         peso: double.parse(controllerPeso.text.trim().replaceAll(',', '.')),
         observacoes: observacoes.isEmpty ? null : observacoes,

@@ -52,7 +52,8 @@ DateTime hoje() {
   return DateTime(agora.year, agora.month, agora.day);
 }
 
-String calcularIdade(DateTime nascimento) {
+/// Idade em anos e meses completos (um "record" do Dart 3)
+({int anos, int meses}) idadeEmAnosEMeses(DateTime nascimento) {
   final agora = DateTime.now();
   int anos = agora.year - nascimento.year;
   int meses = agora.month - nascimento.month;
@@ -61,9 +62,14 @@ String calcularIdade(DateTime nascimento) {
     anos--;
     meses += 12;
   }
-  if (anos > 0) return anos == 1 ? '1 ano' : '$anos anos';
-  if (meses <= 0) return 'menos de 1 mês';
-  return meses == 1 ? '1 mês' : '$meses meses';
+  return (anos: anos < 0 ? 0 : anos, meses: meses);
+}
+
+String calcularIdade(DateTime nascimento) {
+  final idade = idadeEmAnosEMeses(nascimento);
+  if (idade.anos > 0) return idade.anos == 1 ? '1 ano' : '${idade.anos} anos';
+  if (idade.meses <= 0) return 'menos de 1 mês';
+  return idade.meses == 1 ? '1 mês' : '${idade.meses} meses';
 }
 
 String formatarPeso(double? peso) {
@@ -81,7 +87,8 @@ String resumoPet(Pet pet) {
   if (especie != null) partes.add(especie.rotulo);
   if (pet.raca != null && pet.raca!.isNotEmpty) partes.add(pet.raca!);
   if (pet.dataNascimento != null) {
-    partes.add(calcularIdade(pet.dataNascimento!));
+    final idade = calcularIdade(pet.dataNascimento!);
+    partes.add(pet.nascimentoAproximado ? 'aprox. $idade' : idade);
   }
   return partes.join(' • ');
 }

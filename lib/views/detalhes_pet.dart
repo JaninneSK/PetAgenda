@@ -62,9 +62,20 @@ class _DetalhesPetState extends State<DetalhesPet> {
   }
 
   Widget _construirConteudo(Pet pet) {
-    final nascimento = pet.dataNascimento == null
-        ? ''
-        : '${formatarData(pet.dataNascimento)} (${calcularIdade(pet.dataNascimento!)})';
+    // Nascimento exato, idade aproximada ou não informado
+    final String tituloNascimento;
+    final String nascimento;
+    if (pet.dataNascimento == null) {
+      tituloNascimento = 'Nascimento';
+      nascimento = 'Não informado';
+    } else if (pet.nascimentoAproximado) {
+      tituloNascimento = 'Idade (aproximada)';
+      nascimento = calcularIdade(pet.dataNascimento!);
+    } else {
+      tituloNascimento = 'Nascimento';
+      nascimento =
+          '${formatarData(pet.dataNascimento)} (${calcularIdade(pet.dataNascimento!)})';
+    }
 
     return Column(
       children: [
@@ -80,7 +91,7 @@ class _DetalhesPetState extends State<DetalhesPet> {
         _info(Icons.pets, 'Espécie', Especies.deNome(pet.especie)?.rotulo),
         _info(Icons.badge, 'Raça', pet.raca),
         _info(Icons.wc, 'Sexo', Sexos.deNome(pet.sexo)?.rotulo),
-        _info(Icons.cake, 'Nascimento', nascimento),
+        _info(Icons.cake, tituloNascimento, nascimento),
         _info(Icons.straighten, 'Porte', Portes.deNome(pet.porte)?.rotulo),
         _info(Icons.monitor_weight, 'Peso atual', formatarPeso(pet.peso)),
         _info(Icons.notes, 'Mais informações', pet.observacoes),

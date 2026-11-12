@@ -37,6 +37,18 @@ class _HomePageState extends State<HomePage> {
   DateTime _diaFoco = DateTime.now(); // mês que o calendário está mostrando
   DateTime? _diaSelecionado; // dia tocado no calendário (null = nenhum)
 
+  // Um controlador para cada coluna (no modo de duas colunas),
+  // necessários para mostrar a barra de rolagem
+  final _rolagemEsquerda = ScrollController();
+  final _rolagemDireita = ScrollController();
+
+  @override
+  void dispose() {
+    _rolagemEsquerda.dispose();
+    _rolagemDireita.dispose();
+    super.dispose();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -130,7 +142,6 @@ class _HomePageState extends State<HomePage> {
       'Olá, ${sessao.nome}!',
       style: Theme.of(context).textTheme.titleLarge,
     );
-    final calendario = _construirCalendario(porDia);
     final lista = _construirListaAgendamentos(agendamentos, porDia, mapaPets);
     final secaoPets = _construirSecaoPets(pets);
 
@@ -139,6 +150,13 @@ class _HomePageState extends State<HomePage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Pouca altura (celular deitado): o calendário usa linhas mais baixas.
+        // Em tablet a altura é grande e ele mantém o tamanho normal.
+        final calendario = _construirCalendario(
+          porDia,
+          compacto: constraints.maxHeight < 500,
+        );
+
         // Tablet (ou celular deitado): duas colunas lado a lado
         if (constraints.maxWidth >= 720) {
           return Row(
@@ -146,25 +164,35 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 flex: 3,
-                child: SingleChildScrollView(
-                  padding: margem,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      saudacao,
-                      const SizedBox(height: 12.0),
-                      calendario,
-                      const SizedBox(height: 16.0),
-                      lista,
-                    ],
+                child: Scrollbar(
+                  controller: _rolagemEsquerda,
+                  thumbVisibility: true, // barra sempre visível: mostra que rola
+                  child: SingleChildScrollView(
+                    controller: _rolagemEsquerda,
+                    padding: margem,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        saudacao,
+                        const SizedBox(height: 12.0),
+                        calendario,
+                        const SizedBox(height: 16.0),
+                        lista,
+                      ],
+                    ),
                   ),
                 ),
               ),
               Expanded(
                 flex: 2,
-                child: SingleChildScrollView(
-                  padding: margem,
-                  child: secaoPets,
+                child: Scrollbar(
+                  controller: _rolagemDireita,
+                  thumbVisibility: true,
+                  child: SingleChildScrollView(
+                    controller: _rolagemDireita,
+                    padding: margem,
+                    child: secaoPets,
+                  ),
                 ),
               ),
             ],
@@ -194,7 +222,10 @@ class _HomePageState extends State<HomePage> {
   // ---------------------------------------------------------------------
   // Calendário (TableCalendar): marca os dias que têm agendamento pendente
   // ---------------------------------------------------------------------
-  Widget _construirCalendario(Map<int, List<Agendamento>> porDia) {
+  Widget _construirCalendario(
+    Map<int, List<Agendamento>> porDia, {
+    required bool compacto,
+  }) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8),
@@ -204,6 +235,11 @@ class _HomePageState extends State<HomePage> {
           lastDay: DateTime(hoje().year + 5, 12, 31),
           focusedDay: _diaFoco,
           startingDayOfWeek: StartingDayOfWeek.sunday,
+          // Só o arrasto para os lados troca de mês. O padrão (all) também
+          // captura o arrasto vertical e impedia a tela de rolar.
+          availableGestures: AvailableGestures.horizontalSwipe,
+          rowHeight: compacto ? 40 : 52,
+          daysOfWeekHeight: 24, // o padrão (16) cortava a letra "g" de "seg."
           availableCalendarFormats: const {CalendarFormat.month: 'Mês'},
           headerStyle: const HeaderStyle(
             formatButtonVisible: false,

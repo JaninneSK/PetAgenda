@@ -6,7 +6,8 @@ class Pet {
   String? especie; // nome do enum Especies (ex: "gato")
   String? raca;
   String? sexo; // nome do enum Sexos
-  DateTime? dataNascimento;
+  DateTime? dataNascimento; // pode ser nula (tutor não sabe)
+  bool nascimentoAproximado = false; // true: veio de uma idade aproximada
   String? porte; // nome do enum Portes
   double? peso;
   String? observacoes; // "Mais informações" no protótipo
@@ -21,6 +22,7 @@ class Pet {
     required this.raca,
     required this.sexo,
     required this.dataNascimento,
+    this.nascimentoAproximado = false,
     required this.porte,
     required this.peso,
     required this.observacoes,
@@ -34,6 +36,7 @@ class Pet {
     raca = map['raca'];
     sexo = map['sexo'];
     dataNascimento = (map['dataNascimento'] as Timestamp?)?.toDate();
+    nascimentoAproximado = map['nascimentoAproximado'] ?? false;
     porte = map['porte'];
     peso = (map['peso'] as num?)?.toDouble();
     observacoes = map['observacoes'];
@@ -49,6 +52,7 @@ class Pet {
       'sexo': sexo,
       'dataNascimento':
           dataNascimento == null ? null : Timestamp.fromDate(dataNascimento!),
+      'nascimentoAproximado': nascimentoAproximado,
       'porte': porte,
       'peso': peso,
       'observacoes': observacoes,
