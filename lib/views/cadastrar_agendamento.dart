@@ -72,7 +72,12 @@ class _CadastrarAgendamentoState extends State<CadastrarAgendamento> {
       }
     }
     if (_novo) {
-      controllerData.text = formatarData(hoje()); // sugere a data de hoje
+      // Sugere a data já escolhida (ex: dia tocado no calendário) ou a de hoje
+      controllerData.text = formatarData(
+        argumento is Agendamento && argumento.dataHora != null
+            ? argumento.dataHora
+            : hoje(),
+      );
     }
   }
 

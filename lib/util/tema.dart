@@ -7,6 +7,7 @@ class Tema {
   // (o branco sobre o verde da marca tem pouco contraste).
   static const Color verdeEscuro = Color(0xFF42826F);
   static const Color laranja = Color(0xFFF8BB64); // destaques (dias do calendário)
+  static const Color laranjaClaro = Color(0xFFFCE3BC); // dia de hoje no calendário
   static const Color cinzaCampo = Color(0xFFF2F1F1);
   static const Color fundo = Color(0xFFF5F5F5);
   static const Color textoEscuro = Color(0xFF1F2D2A);

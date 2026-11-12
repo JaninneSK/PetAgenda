@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:petagenda/models/agendamento.dart';
 import 'package:petagenda/models/pet.dart';
-import 'package:petagenda/models/tipos_cuidado.dart';
 import 'package:petagenda/notifiers/sessao_notifier.dart';
 import 'package:petagenda/services/agendamento_service.dart';
 import 'package:petagenda/services/pet_service.dart';
-import 'package:petagenda/util/formatador.dart';
 import 'package:petagenda/util/mensagem.dart';
 import 'package:petagenda/util/tema.dart';
 import 'package:petagenda/views/cadastrar_agendamento.dart';
+import 'package:petagenda/widgets/cartao_agendamento.dart';
 import 'package:petagenda/widgets/conteudo_centralizado.dart';
 import 'package:provider/provider.dart';
 
@@ -126,65 +125,17 @@ class _ListarAgendamentosState extends State<ListarAgendamentos> {
   }
 
   Widget _item(Agendamento agendamento, Map<String, Pet> pets) {
-    final pet = pets[agendamento.petId];
-    final tipo = TiposCuidado.deNome(agendamento.tipo);
-    final atrasado =
-        !agendamento.realizado &&
-        agendamento.dataHora != null &&
-        agendamento.dataHora!.isBefore(DateTime.now());
-
-    return Card(
-      child: ListTile(
-        key: ValueKey(agendamento.id),
-        // Marcar / desmarcar como realizado direto na lista
-        leading: Checkbox(
-          value: agendamento.realizado,
-          onChanged: (valor) => _alterarRealizado(agendamento, valor ?? false),
-        ),
-        title: Row(
-          children: [
-            Icon(tipo?.icone ?? Icons.event, size: 20, color: Tema.verdeEscuro),
-            const SizedBox(width: 8.0),
-            Expanded(
-              child: Text(
-                agendamento.titulo ?? '',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  decoration: agendamento.realizado
-                      ? TextDecoration.lineThrough
-                      : null,
-                ),
-              ),
-            ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${pet?.nome ?? 'Pet removido'} • ${tipo?.rotulo ?? ''}'),
-            Text(
-              '${formatarData(agendamento.dataHora)} às '
-              '${formatarHora(agendamento.dataHora)}'
-              '${atrasado ? ' • Atrasado' : ''}',
-              style: TextStyle(
-                color: atrasado ? Tema.vermelhoErro : null,
-                fontWeight: atrasado ? FontWeight.bold : null,
-              ),
-            ),
-          ],
-        ),
-        isThreeLine: true,
-        trailing: IconButton(
-          tooltip: 'Excluir agendamento',
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () => _excluir(agendamento),
-        ),
-        // Tocar no item abre a edição
-        onTap: () => Navigator.pushNamed(
-          context,
-          CadastrarAgendamento.nomeRota,
-          arguments: agendamento,
-        ),
+    return CartaoAgendamento(
+      agendamento: agendamento,
+      pet: pets[agendamento.petId],
+      // Marcar / desmarcar como realizado direto na lista
+      onRealizadoChanged: (valor) => _alterarRealizado(agendamento, valor),
+      onExcluir: () => _excluir(agendamento),
+      // Tocar no item abre a edição
+      onTap: () => Navigator.pushNamed(
+        context,
+        CadastrarAgendamento.nomeRota,
+        arguments: agendamento,
       ),
     );
   }
