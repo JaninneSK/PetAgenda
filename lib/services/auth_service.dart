@@ -50,4 +50,58 @@ class AuthService {
   Future<void> sair() async {
     await _auth.signOut();
   }
+
+  /// true se a conta entra com e-mail e senha
+  /// (contas do Google, no futuro, não têm senha para alterar)
+  bool get temSenha {
+    final usuario = _auth.currentUser;
+    if (usuario == null) return false;
+    return usuario.providerData.any((info) => info.providerId == 'password');
+  }
+
+  /// Operações sensíveis (alterar senha, excluir conta) exigem um login recente.
+  /// Por isso confirmamos a senha atual antes de executá-las.
+  Future<void> _reautenticar(String senhaAtual) async {
+    final usuario = _auth.currentUser!;
+    final credencial = EmailAuthProvider.credential(
+      email: usuario.email!,
+      password: senhaAtual,
+    );
+    await usuario.reauthenticateWithCredential(credencial);
+  }
+
+  Future<void> alterarSenha({
+    required String senhaAtual,
+    required String novaSenha,
+  }) async {
+    await _reautenticar(senhaAtual);
+    await _auth.currentUser!.updatePassword(novaSenha);
+  }
+
+  /// Atualiza o nome no Authentication e nome, login e foto no Firestore
+  Future<void> atualizarPerfil({
+    required String nome,
+    required String apelido,
+    String? foto,
+  }) async {
+    final usuario = _auth.currentUser!;
+    if (usuario.displayName != nome) {
+      await usuario.updateDisplayName(nome);
+    }
+    await _usuarioService.atualizar(
+      usuario.uid,
+      nome: nome,
+      apelido: apelido,
+      foto: foto,
+    );
+  }
+
+  /// Confirma a senha, apaga os dados do Firestore e, por último, a conta.
+  /// (Se a senha estiver errada, nada é apagado.)
+  Future<void> excluirConta(String senhaAtual) async {
+    await _reautenticar(senhaAtual);
+    final usuario = _auth.currentUser!;
+    await _usuarioService.excluirDados(usuario.uid);
+    await usuario.delete();
+  }
 }

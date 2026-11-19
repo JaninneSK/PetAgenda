@@ -14,6 +14,7 @@ import 'package:petagenda/views/detalhes_pet.dart';
 import 'package:petagenda/views/listar_agendamentos.dart';
 import 'package:petagenda/views/login_page.dart';
 import 'package:petagenda/views/meus_pets.dart';
+import 'package:petagenda/views/minha_conta.dart';
 import 'package:petagenda/widgets/avatar_pet.dart';
 import 'package:petagenda/widgets/cartao_agendamento.dart';
 import 'package:petagenda/widgets/logo_petagenda.dart';
@@ -487,8 +488,12 @@ class _HomePageState extends State<HomePage> {
             'Novo agendamento',
             CadastrarAgendamento.nomeRota,
           ),
-          // A tela abaixo será criada nos próximos passos
-          _itemMenu(context, Icons.account_circle, 'Minha conta'),
+          _itemMenu(
+            context,
+            Icons.account_circle,
+            'Minha conta',
+            MinhaConta.nomeRota,
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout),

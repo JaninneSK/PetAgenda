@@ -7,8 +7,14 @@ import 'package:petagenda/util/tema.dart';
 class AvatarPet extends StatelessWidget {
   final String? foto;
   final double raio;
+  final IconData icone; // ícone mostrado quando não há foto
 
-  const AvatarPet({super.key, this.foto, this.raio = 24});
+  const AvatarPet({
+    super.key,
+    this.foto,
+    this.raio = 24,
+    this.icone = Icons.pets,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +28,7 @@ class AvatarPet extends StatelessWidget {
     return CircleAvatar(
       radius: raio,
       backgroundColor: Tema.verde,
-      child: Icon(Icons.pets, size: raio, color: Colors.white),
+      child: Icon(icone, size: raio, color: Colors.white),
     );
   }
 }

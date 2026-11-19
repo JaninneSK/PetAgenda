@@ -267,4 +267,19 @@ class Validador {
       return null;
     };
   }
+
+  /// Nova senha (alterar senha): as mesmas regras do cadastro e, além disso,
+  /// precisa ser diferente da senha atual.
+  static FormFieldValidator<String> validarNovaSenha(
+    TextEditingController controllerSenhaAtual,
+  ) {
+    return (value) {
+      final erro = validarSenha()(value);
+      if (erro != null) return erro;
+      if (value == controllerSenhaAtual.text) {
+        return "A nova senha deve ser diferente da atual";
+      }
+      return null;
+    };
+  }
 }

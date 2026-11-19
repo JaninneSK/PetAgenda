@@ -16,6 +16,8 @@ String mensagemErroAuth(FirebaseAuthException erro) {
       return 'E-mail ou senha incorretos.';
     case 'user-disabled':
       return 'Esta conta foi desativada.';
+    case 'requires-recent-login':
+      return 'Por segurança, saia, entre novamente e repita a operação.';
     case 'too-many-requests':
       return 'Muitas tentativas. Aguarde um pouco e tente de novo.';
     case 'network-request-failed':
