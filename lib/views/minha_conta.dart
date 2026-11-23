@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:petagenda/models/usuario.dart';
 import 'package:petagenda/notifiers/sessao_notifier.dart';
 import 'package:petagenda/services/auth_service.dart';
+import 'package:petagenda/services/lembrete_service.dart';
 import 'package:petagenda/services/usuario_service.dart';
 import 'package:petagenda/util/mensagem.dart';
 import 'package:petagenda/util/mensagens_erro.dart';
@@ -111,6 +112,49 @@ class _MinhaContaState extends State<MinhaConta> {
             ),
           ),
         ),
+        const SizedBox(height: 16.0),
+
+        // Lembretes: explica o que o app avisa e permite testar
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Lembretes',
+                  style: TextStyle(
+                    color: Tema.verdeEscuro,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4.0),
+                Text(
+                  'Você recebe um resumo às ${LembreteService.horaResumo}h nos '
+                  'dias com agendamentos e um aviso '
+                  '${LembreteService.minutosAntes} minutos antes de cada horário.',
+                ),
+                const SizedBox(height: 4.0),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _testarAgora,
+                      icon: const Icon(Icons.notifications_active),
+                      label: const Text('Testar agora'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _testarEmUmMinuto,
+                      icon: const Icon(Icons.schedule),
+                      label: const Text('Testar em 1 min'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
         const SizedBox(height: 24.0),
 
         ElevatedButton.icon(
@@ -172,6 +216,32 @@ class _MinhaContaState extends State<MinhaConta> {
         const SizedBox(height: 2.0),
         Text(valor, style: const TextStyle(fontSize: 17)),
       ],
+    );
+  }
+
+  Future<void> _testarAgora() async {
+    final ok = await LembreteService.instancia.testarAgora();
+    if (!mounted) return;
+    mostrarMensagem(
+      context,
+      ok
+          ? 'Notificação enviada. Veja a barra de notificações do celular.'
+          : 'Não foi possível enviar. Permita as notificações do PetAgenda '
+                'nas configurações do celular.',
+      erro: !ok,
+    );
+  }
+
+  Future<void> _testarEmUmMinuto() async {
+    final ok = await LembreteService.instancia.testarEmUmMinuto();
+    if (!mounted) return;
+    mostrarMensagem(
+      context,
+      ok
+          ? 'Agendado! Saia do app e aguarde de 1 a 2 minutos.'
+          : 'Não foi possível agendar. Permita as notificações do PetAgenda '
+                'nas configurações do celular.',
+      erro: !ok,
     );
   }
 

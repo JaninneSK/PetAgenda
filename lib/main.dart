@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:petagenda/firebase_options.dart'; // gerado pelo comando "flutterfire configure"
 import 'package:petagenda/myapp.dart';
 import 'package:petagenda/notifiers/sessao_notifier.dart';
+import 'package:petagenda/services/lembrete_service.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -13,6 +14,9 @@ Future<void> main() async {
 
   // Carrega os nomes de meses e dias da semana em português (calendário)
   await initializeDateFormatting('pt_BR');
+
+  // Prepara as notificações (lembretes dos agendamentos)
+  await LembreteService.instancia.inicializar();
 
   runApp(
     MultiProvider(

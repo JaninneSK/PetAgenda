@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:petagenda/models/usuario.dart';
+import 'package:petagenda/services/lembrete_service.dart';
 import 'package:petagenda/services/usuario_service.dart';
 
 /// Tudo o que o app faz com o Firebase Authentication (login por e-mail e senha)
@@ -48,6 +49,8 @@ class AuthService {
   }
 
   Future<void> sair() async {
+    // Os lembretes são do usuário que está saindo: apaga todos
+    await LembreteService.instancia.cancelarTodos();
     await _auth.signOut();
   }
 
@@ -101,6 +104,7 @@ class AuthService {
   Future<void> excluirConta(String senhaAtual) async {
     await _reautenticar(senhaAtual);
     final usuario = _auth.currentUser!;
+    await LembreteService.instancia.cancelarTodos();
     await _usuarioService.excluirDados(usuario.uid);
     await usuario.delete();
   }

@@ -4,6 +4,7 @@ import 'package:petagenda/models/pet.dart';
 import 'package:petagenda/notifiers/sessao_notifier.dart';
 import 'package:petagenda/services/agendamento_service.dart';
 import 'package:petagenda/services/auth_service.dart';
+import 'package:petagenda/services/lembrete_service.dart';
 import 'package:petagenda/services/pet_service.dart';
 import 'package:petagenda/util/formatador.dart';
 import 'package:petagenda/util/mensagem.dart';
@@ -47,6 +48,7 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _rolagemEsquerda.dispose();
     _rolagemDireita.dispose();
+    LembreteService.instancia.parar(); // para de acompanhar os agendamentos
     super.dispose();
   }
 
@@ -59,6 +61,9 @@ class _HomePageState extends State<HomePage> {
     _agendamentoService = AgendamentoService(usuarioId);
     _streamAgendamentos = _agendamentoService!.listar();
     _streamPets = PetService(usuarioId).listar();
+
+    // Mantém os lembretes (notificações) em dia com os agendamentos
+    LembreteService.instancia.iniciar(usuarioId);
   }
 
   @override
