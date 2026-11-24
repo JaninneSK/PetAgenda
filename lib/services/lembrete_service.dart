@@ -19,7 +19,7 @@ import 'package:timezone/timezone.dart' as tz;
 /// realizado) os lembretes são recalculados.
 class LembreteService {
   // ----- Ajustes: pode mudar estes valores -----
-  static const int horaResumo = 21; // resumo do dia às 08:00
+  static const int horaResumo = 8; // resumo do dia às 08:00
   static const int minutosAntes = 30; // aviso 30 min antes (0 = desligado)
   static const int diasAFrente = 30; // agenda os próximos 30 dias
 

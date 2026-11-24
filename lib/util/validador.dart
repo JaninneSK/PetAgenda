@@ -66,14 +66,22 @@ class Validador {
     };
   }
 
-  /// Cadastro: o Firebase exige senhas com no mínimo 6 caracteres
+  /// Cadastro e nova senha: no mínimo 8 caracteres, com letra maiúscula,
+  /// letra minúscula e número. O login NÃO usa esta regra (validarSenhaObrigatoria),
+  /// então contas antigas, com senhas mais simples, continuam entrando normalmente.
   static FormFieldValidator<String> validarSenha() {
     return (value) {
       final texto = value ?? '';
       if (texto.isEmpty) {
         return "Informe a senha";
-      } else if (texto.length < 6) {
-        return "A senha deve ter pelo menos 6 caracteres";
+      } else if (texto.length < 8) {
+        return "A senha deve ter pelo menos 8 caracteres";
+      } else if (!RegExp(r'[A-Z]').hasMatch(texto)) {
+        return "A senha deve ter pelo menos uma letra maiúscula";
+      } else if (!RegExp(r'[a-z]').hasMatch(texto)) {
+        return "A senha deve ter pelo menos uma letra minúscula";
+      } else if (!RegExp(r'[0-9]').hasMatch(texto)) {
+        return "A senha deve ter pelo menos um número";
       } else {
         return null;
       }
