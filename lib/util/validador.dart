@@ -66,25 +66,28 @@ class Validador {
     };
   }
 
-  /// Cadastro e nova senha: no mínimo 8 caracteres, com letra maiúscula,
-  /// letra minúscula e número. O login NÃO usa esta regra (validarSenhaObrigatoria),
-  /// então contas antigas, com senhas mais simples, continuam entrando normalmente.
+  /// Requisitos da senha (cadastro e nova senha). É usado pelo validador abaixo
+  /// e também pela lista de requisitos mostrada na tela (RequisitosSenha).
+  /// O login NÃO usa estas regras (validarSenhaObrigatoria): contas antigas,
+  /// com senhas mais simples, continuam entrando normalmente.
+  static List<({String texto, bool atendido})> requisitosSenha(String senha) {
+    return [
+      (texto: 'Pelo menos 8 caracteres', atendido: senha.length >= 8),
+      (texto: 'Uma letra maiúscula (A-Z)', atendido: RegExp(r'[A-Z]').hasMatch(senha)),
+      (texto: 'Uma letra minúscula (a-z)', atendido: RegExp(r'[a-z]').hasMatch(senha)),
+      (texto: 'Um número (0-9)', atendido: RegExp(r'[0-9]').hasMatch(senha)),
+    ];
+  }
+
   static FormFieldValidator<String> validarSenha() {
     return (value) {
       final texto = value ?? '';
       if (texto.isEmpty) {
         return "Informe a senha";
-      } else if (texto.length < 8) {
-        return "A senha deve ter pelo menos 8 caracteres";
-      } else if (!RegExp(r'[A-Z]').hasMatch(texto)) {
-        return "A senha deve ter pelo menos uma letra maiúscula";
-      } else if (!RegExp(r'[a-z]').hasMatch(texto)) {
-        return "A senha deve ter pelo menos uma letra minúscula";
-      } else if (!RegExp(r'[0-9]').hasMatch(texto)) {
-        return "A senha deve ter pelo menos um número";
-      } else {
-        return null;
       }
+      // Quais requisitos faltam aparecem juntos na lista abaixo do campo
+      final atendeTodos = requisitosSenha(texto).every((r) => r.atendido);
+      return atendeTodos ? null : "A senha não atende a todos os requisitos";
     };
   }
 

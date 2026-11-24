@@ -36,7 +36,7 @@ Autora: Janinne Silva Krauspenhar.
  
 - **Flutter e Dart** (Material Design)
 - **Firebase Authentication** (e-mail e senha)
-- **Cloud Firestore** (banco de dados; cada usuário só acessa os próprios dados, veja `firestore.rules`)
+- **Cloud Firestore** (banco de dados)
 - **Provider** (sessão do usuário logado)
 - `table_calendar`, `image_picker`, `mask_text_input_formatter`, `intl`,
   `flutter_local_notifications`
@@ -72,14 +72,6 @@ Em **Minha conta > Lembretes**, os botões de teste conferem se as notificaçõe
                                   └──> /alterarsenha
 ```
  
-Se já houver uma sessão aberta, a splash vai direto para `/home`.
- 
-## Estrutura do projeto
- 
-```
-lib/
-  main.dart            inicia o Firebase, o Provider e as notificações
-  myapp.dart           tema, idioma (pt-BR) e rotas
   models/              Pet, Agendamento, Usuario e enums (espécie, sexo, porte, tipo de cuidado)
   services/            acesso ao Firebase: AuthService, PetService, AgendamentoService,
                        UsuarioService e LembreteService

@@ -15,6 +15,8 @@ class Tema {
   // Cores dos erros de validação
   static const Color vermelhoErro = Color(0xFFB3261E);
   static const Color fundoErro = Color(0xFFFFE3E0);
+  // Vinho escuro para mensagens de erro sobre o fundo verde (contraste 5:1)
+  static const Color vinhoSobreVerde = Color(0xFF6E120D);
 
   static OutlineInputBorder _borda(Color cor, double largura) {
     return OutlineInputBorder(
@@ -90,14 +92,13 @@ class Tema {
   }
 
   /// Ajusta o tema para as telas com fundo verde (login e cadastro):
-  /// a mensagem de erro aparece em vermelho sobre uma faixa branca
-  /// (vermelho direto no verde quase não aparece).
+  /// a mensagem de erro aparece em vinho escuro e negrito
+  /// (o vermelho comum quase não aparece sobre o verde).
   static ThemeData sobreVerde(ThemeData base) {
     return base.copyWith(
       inputDecorationTheme: _temaCampos(
         estiloErro: const TextStyle(
-          color: vermelhoErro,
-          backgroundColor: Colors.white,
+          color: vinhoSobreVerde,
           fontWeight: FontWeight.bold,
           fontSize: 13,
         ),

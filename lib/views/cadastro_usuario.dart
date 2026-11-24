@@ -7,6 +7,7 @@ import 'package:petagenda/util/tema.dart';
 import 'package:petagenda/util/validador.dart';
 import 'package:petagenda/views/home_page.dart';
 import 'package:petagenda/widgets/conteudo_centralizado.dart';
+import 'package:petagenda/widgets/requisitos_senha.dart';
 
 class CadastroUsuario extends StatefulWidget {
   static const nomeRota = '/cadastro';
@@ -29,6 +30,7 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
 
   bool _ocultarSenha = true;
   bool _salvando = false;
+  final _focoSenha = FocusNode(); // usado pela lista de requisitos da senha
 
   @override
   void dispose() {
@@ -38,6 +40,7 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
     controllerApelido.dispose();
     controllerSenha.dispose();
     controllerConfirmarSenha.dispose();
+    _focoSenha.dispose();
     super.dispose();
   }
 
@@ -125,6 +128,7 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
 
         TextFormField(
           controller: controllerSenha,
+          focusNode: _focoSenha,
           validator: Validador.validarSenha(),
           obscureText: _ocultarSenha,
           obscuringCharacter: "*",
@@ -140,6 +144,13 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
             ),
           ),
           maxLength: 30,
+        ),
+
+        // Todos os requisitos juntos; some quando a senha atende a todos
+        RequisitosSenha(
+          controller: controllerSenha,
+          focusNode: _focoSenha,
+          sobreVerde: true,
         ),
         const SizedBox(height: 8.0),
 
@@ -193,36 +204,25 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
                   ),
                 ),
                 if (campo.hasError)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 18,
-                          color: Tema.vermelhoErro,
-                        ),
-                        const SizedBox(width: 6.0),
-                        Flexible(
-                          child: Text(
-                            campo.errorText!,
-                            style: const TextStyle(
-                              color: Tema.vermelhoErro,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 18,
+                        color: Tema.vinhoSobreVerde,
+                      ),
+                      const SizedBox(width: 6.0),
+                      Flexible(
+                        child: Text(
+                          campo.errorText!,
+                          style: const TextStyle(
+                            color: Tema.vinhoSobreVerde,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
               ],
             );

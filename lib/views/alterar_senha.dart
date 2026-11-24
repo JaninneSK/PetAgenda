@@ -5,6 +5,7 @@ import 'package:petagenda/util/mensagem.dart';
 import 'package:petagenda/util/mensagens_erro.dart';
 import 'package:petagenda/util/validador.dart';
 import 'package:petagenda/widgets/conteudo_centralizado.dart';
+import 'package:petagenda/widgets/requisitos_senha.dart';
 
 class AlterarSenha extends StatefulWidget {
   static const nomeRota = '/alterarsenha';
@@ -25,6 +26,7 @@ class _AlterarSenhaState extends State<AlterarSenha> {
 
   bool _ocultarSenha = true;
   bool _salvando = false;
+  final _focoNovaSenha = FocusNode(); // usado pela lista de requisitos da senha
 
   @override
   void dispose() {
@@ -32,6 +34,7 @@ class _AlterarSenhaState extends State<AlterarSenha> {
     controllerSenhaAtual.dispose();
     controllerNovaSenha.dispose();
     controllerConfirmarSenha.dispose();
+    _focoNovaSenha.dispose();
     super.dispose();
   }
 
@@ -83,6 +86,7 @@ class _AlterarSenhaState extends State<AlterarSenha> {
 
         TextFormField(
           controller: controllerNovaSenha,
+          focusNode: _focoNovaSenha,
           validator: Validador.validarNovaSenha(controllerSenhaAtual),
           obscureText: _ocultarSenha,
           obscuringCharacter: "*",
@@ -91,6 +95,12 @@ class _AlterarSenhaState extends State<AlterarSenha> {
             prefixIcon: Icon(Icons.lock),
           ),
           maxLength: 30,
+        ),
+
+        // Todos os requisitos juntos; some quando a senha atende a todos
+        RequisitosSenha(
+          controller: controllerNovaSenha,
+          focusNode: _focoNovaSenha,
         ),
         const SizedBox(height: 8.0),
 
